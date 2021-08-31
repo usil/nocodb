@@ -44,10 +44,10 @@
 
 <script>
 // import ApiFactory from '@/components/project/spreadsheet/apis/apiFactory'
+import TableCell from '../cell'
 import ItemChip from '@/components/project/spreadsheet/components/virtualCell/components/itemChip'
 import ListChildItemsModal
   from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
-import TableCell from '../cell'
 
 export default {
   name: 'LookupCell',
@@ -61,7 +61,8 @@ export default {
     sqlUi: [Object, Function],
     active: Boolean,
     isNew: Boolean,
-    isForm: Boolean
+    isForm: Boolean,
+    metas: Object
   },
   data: () => ({
     lookupListModal: false
@@ -76,7 +77,7 @@ export default {
       })
     },
     lookUpMeta() {
-      return this.$store.state.meta.metas[this.column.lk.ltn]
+      return this.metas ? this.metas[this.column.lk.ltn] : this.$store.state.meta.metas[this.column.lk.ltn]
     },
     assocMeta() {
       return this.column.lk.type === 'mm' && this.$store.state.meta.metas[this.column.lk.vtn]

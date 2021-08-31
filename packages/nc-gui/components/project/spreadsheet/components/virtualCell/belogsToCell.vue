@@ -140,7 +140,7 @@ export default {
   }),
   computed: {
     parentMeta() {
-      return this.$store.state.meta.metas[this.bt.rtn]
+      return this.metas ? this.metas[this.bt.rtn] : this.$store.state.meta.metas[this.bt.rtn]
     },
     // todo : optimize
     parentApi() {
@@ -164,7 +164,9 @@ export default {
       return this.parentMeta && (this.parentMeta.columns.find(c => c.pk) || {})._cn
     },
     parentQueryParams() {
-      if (!this.parentMeta) { return {} }
+      if (!this.parentMeta) {
+        return {}
+      }
       // todo: use reduce
       return {
         hm: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.hm).map(({ hm }) => hm.tn).join()) || '',
@@ -174,7 +176,9 @@ export default {
     },
     parentAvailableColumns() {
       const hideCols = ['created_at', 'updated_at']
-      if (!this.parentMeta) { return [] }
+      if (!this.parentMeta) {
+        return []
+      }
 
       const columns = []
       if (this.parentMeta.columns) {

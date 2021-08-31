@@ -307,6 +307,9 @@
         :view-status.sync="viewStatus"
         :columns-width.sync="columnsWidth"
         :show-system-fields.sync="showSystemFields"
+        :other-query-params="{
+          nestedAndLookupColumnParams:nestedAndLookupColumnParams
+        }"
         @mapFieldsAndShowFields="mapFieldsAndShowFields"
         @loadTableData="loadTableData"
         @showAdditionalFeatOverlay="showAdditionalFeatOverlay($event)"

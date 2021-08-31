@@ -163,7 +163,8 @@ export default {
     sqlUi: [Object, Function],
     active: Boolean,
     isNew: Boolean,
-    isForm: Boolean
+    isForm: Boolean,
+    metas: Object
   },
   data: () => ({
     newRecordModal: false,
@@ -179,7 +180,7 @@ export default {
   }),
   computed: {
     childMeta() {
-      return this.$store.state.meta.metas[this.hm.tn]
+      return this.metas ? this.metas[this.hm.tn] : this.$store.state.meta.metas[this.hm.tn]
     },
     // todo : optimize
     childApi() {
@@ -214,7 +215,9 @@ export default {
     },
     childAvailableColumns() {
       const hideCols = ['created_at', 'updated_at']
-      if (!this.childMeta) { return [] }
+      if (!this.childMeta) {
+        return []
+      }
 
       const columns = []
       if (this.childMeta.columns) {
@@ -226,7 +229,9 @@ export default {
       return columns
     },
     childQueryParams() {
-      if (!this.childMeta) { return {} }
+      if (!this.childMeta) {
+        return {}
+      }
       // todo: use reduce
       return {
         hm: (this.childMeta && this.childMeta.v && this.childMeta.v.filter(v => v.hm).map(({ hm }) => hm.tn).join()) || '',

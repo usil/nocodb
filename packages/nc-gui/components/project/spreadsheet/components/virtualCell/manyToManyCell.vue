@@ -143,7 +143,8 @@ export default {
     sqlUi: [Object, Function],
     active: Boolean,
     isNew: Boolean,
-    isForm: Boolean
+    isForm: Boolean,
+    metas: Object
   },
   data: () => ({
     isNewChild: false,
@@ -171,10 +172,10 @@ export default {
       }
     },
     childMeta() {
-      return this.$store.state.meta.metas[this.mm.rtn]
+      return this.metas ? this.metas[this.mm.rtn] : this.$store.state.meta.metas[this.mm.rtn]
     },
     assocMeta() {
-      return this.$store.state.meta.metas[this.mm.vtn]
+      return this.metas ? this.metas[this.mm.vtn] : this.$store.state.meta.metas[this.mm.vtn]
     },
     // todo : optimize
     childApi() {

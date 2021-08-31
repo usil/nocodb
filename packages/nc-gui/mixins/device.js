@@ -18,7 +18,10 @@ export default {
     isThisMobile() { // just an example, could be one specific value if that's all you need
       return this.isHydrated ? this.$vuetify && this.$vuetify.breakpoint && this.$vuetify.breakpoint.smAndDown : false
     },
-
+    isPublicView() {
+      debugger
+      return /^\/nc\/view\/[^/]+$/.test(this.$route.path)
+    },
     isTool() {
       return process.env && process.env.tool
     },

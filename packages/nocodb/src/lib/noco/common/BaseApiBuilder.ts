@@ -125,7 +125,7 @@ export default abstract class BaseApiBuilder<T extends Noco> implements XcDynami
 
   protected models: { [key: string]: BaseModelSql };
 
-  protected metas: { [key: string]: any };
+  public metas: { [key: string]: any };
 
   protected sqlClient: MysqlClient | PgClient | SqlClient | any;
 

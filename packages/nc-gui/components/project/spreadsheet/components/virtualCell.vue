@@ -4,6 +4,7 @@
       <has-many-cell
         v-if="hm"
         ref="cell"
+        :metas="metas"
         :row="row"
         :value="row[`${hm._tn}List`]"
         :meta="meta"
@@ -19,6 +20,7 @@
       <many-to-many-cell
         v-else-if="mm"
         ref="cell"
+        :metas="metas"
         :row="row"
         :value="row[`${mm._rtn}MMList`]"
         :meta="meta"
@@ -35,6 +37,7 @@
       <belongs-to-cell
         v-else-if="bt"
         ref="cell"
+        :metas="metas"
         :disabled-columns="disabledColumns"
         :active="active"
         :row="row"
@@ -51,6 +54,7 @@
       />
       <lookup-cell
         v-else-if="lookup"
+        :metas="metas"
         :disabled-columns="disabledColumns"
         :active="active"
         :row="row"
@@ -119,7 +123,8 @@ export default {
       type: Boolean,
       default: false
     },
-    disabledColumns: Object
+    disabledColumns: Object,
+    metas: Object
   },
   computed: {
     hm() {

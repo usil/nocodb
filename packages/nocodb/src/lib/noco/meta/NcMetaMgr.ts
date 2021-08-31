@@ -39,6 +39,7 @@ import RestAuthCtrl from "../rest/RestAuthCtrlEE";
 import {packageVersion} from 'nc-help';
 import NcMetaIO, {META_TABLES} from "./NcMetaIO";
 import {promisify} from "util";
+import {BaseModelSql} from "../../dataMapper";
 
 const XC_PLUGIN_DET = 'XC_PLUGIN_DET';
 
@@ -1106,6 +1107,9 @@ export default class NcMetaMgr {
         case 'getSharedViewData':
           result = await this.getSharedViewData(req, args);
           break;
+        case 'getSharedViewMetaData':
+          result = await this.getSharedViewMetaData(req, args);
+          break;
         case 'xcRelease':
           result = await this.xcRelease();
           break;
@@ -1352,7 +1356,7 @@ export default class NcMetaMgr {
         case 'projectList':
           result = await this.xcMeta.userProjectList(req?.session?.passport?.user?.id);
           result.forEach(p => {
-            const config =JSON.parse(p.config);
+            const config = JSON.parse(p.config);
             p.projectType = config?.projectType;
             p.prefix = config?.prefix
             delete p.config
@@ -2904,7 +2908,7 @@ export default class NcMetaMgr {
         ?.find(pb => pb.id === viewMeta.project_id)
         ?.apiBuilders
         ?.find(ab => ab.dbAlias === viewMeta.db_alias);
-      const model = apiBuilder?.xcModels?.[viewMeta.model_name];
+      const model: BaseModelSql = apiBuilder?.xcModels?.[viewMeta.model_name];
 
       if (model) {
         const queryParams = JSON.parse(viewMeta.query_params);
@@ -2933,7 +2937,8 @@ export default class NcMetaMgr {
             where,
             fields
           }),
-          client: apiBuilder?.client
+          client: apiBuilder?.client,
+          columnsWidth: queryParams?.columnsWidth
         }
 
       }
@@ -3727,8 +3732,10 @@ export default class NcMetaMgr {
     return result;
   }
 
+  protected async getSharedViewMetaData(_req, _args: any): Promise<any> {
+    throw new XCEeError()
+  }
 }
-
 
 export class XCEeError extends Error {
   public static throw() {

@@ -157,6 +157,7 @@
               :active="selected.col === col && selected.row === row"
               :sql-ui="sqlUi"
               :is-new="rowMeta.new"
+              :metas="metas"
               v-on="$listeners"
               @updateCol="(...args) => updateCol(...args, columnObj.bt && meta.columns.find( c => c.cn === columnObj.bt.cn), col, row)"
             />
@@ -266,7 +267,8 @@ export default {
     isVirtual: Boolean,
     isLocked: Boolean,
     columnsWidth: { type: Object },
-    isPkAvail: Boolean
+    isPkAvail: Boolean,
+    metas: Object
   },
   data: () => ({
     resizingCol: null,

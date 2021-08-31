@@ -145,7 +145,7 @@ export default {
 
       return this.xWhere ? where + `~and(${this.xWhere})` : where
     },
-    nestedAndRollupColumnParams() {
+    nestedAndLookupColumnParams() {
       // generate params for nested columns
       const nestedFields = ((this.meta && this.meta.v && this.meta.v) || []).reduce((obj, vc) => {
         if (vc.hm) {
@@ -205,7 +205,7 @@ export default {
         // condition: this.condition,
         where: this.concatenatedXWhere,
         sort: this.sort,
-        ...this.nestedAndRollupColumnParams
+        ...this.nestedAndLookupColumnParams
         // ...Object.entries(nestedFields).reduce((ro, [k, a]) => ({ ...ro, [k]: a.join(',') })),
         // ...fieldsObj
       }

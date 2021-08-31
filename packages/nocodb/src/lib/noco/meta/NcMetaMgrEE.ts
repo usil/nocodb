@@ -2,66 +2,67 @@ import {Tele} from 'nc-help';
 import {v4 as uuidv4} from 'uuid';
 
 import NcMetaMgr from "./NcMetaMgr";
+import {BaseModelSql} from "../../dataMapper";
 
 export default class NcMetaMgrEE extends NcMetaMgr {
 
-/*  protected async handlePublicRequest(req, res, next) {
-    const args = req.body;
-    // let result;
-    try {
-      switch (args.api) {
-
-        default:
-          return super.handlePublicRequest(req, res, next)
-
-      }
-    } catch (e) {
-      return next(e);
-    }
-  }
-
-  protected async handleRequest(req, res, next) {
-    try {
+  /*  protected async handlePublicRequest(req, res, next) {
       const args = req.body;
-      let result;
+      // let result;
+      try {
+        switch (args.api) {
 
-      switch (args.api) {
+          default:
+            return super.handlePublicRequest(req, res, next)
 
-
-        default:
-          return this.handleRequest(req, res, next);
-      }
-      if (this.listener) {
-        await this.listener({
-          user: req.user,
-          req: req.body,
-          res: result,
-          ctx: {
-            req, res
-          }
-        });
-      }
-
-      if (result && typeof result === 'object' && 'download' in result && 'filePath' in result && result.download === true) {
-        return res.download(result.filePath);
-      }
-
-
-      res.json(result);
-
-    } catch (e) {
-      console.log(e);
-      if (e instanceof XCEeError) {
-        res.status(402).json({
-          msg: e.message
-        })
-      } else {
-        res.status(400).json({
-          msg: e.message
-        })
+        }
+      } catch (e) {
+        return next(e);
       }
     }
-  }*/
+
+    protected async handleRequest(req, res, next) {
+      try {
+        const args = req.body;
+        let result;
+
+        switch (args.api) {
+
+
+          default:
+            return this.handleRequest(req, res, next);
+        }
+        if (this.listener) {
+          await this.listener({
+            user: req.user,
+            req: req.body,
+            res: result,
+            ctx: {
+              req, res
+            }
+          });
+        }
+
+        if (result && typeof result === 'object' && 'download' in result && 'filePath' in result && result.download === true) {
+          return res.download(result.filePath);
+        }
+
+
+        res.json(result);
+
+      } catch (e) {
+        console.log(e);
+        if (e instanceof XCEeError) {
+          res.status(402).json({
+            msg: e.message
+          })
+        } else {
+          res.status(400).json({
+            msg: e.message
+          })
+        }
+      }
+    }*/
 
 
   protected async xcTableList(req, args): Promise<any> {
@@ -108,6 +109,44 @@ export default class NcMetaMgrEE extends NcMetaMgr {
   }
 
 
+  protected async getSharedViewMetaData(_req, args: any): Promise<any> {
+    try {
+      const viewMeta = await this.xcMeta.knex('nc_shared_views').where({
+        view_id: args.args.view_id
+      }).first();
+
+      if (viewMeta && viewMeta.password && viewMeta.password !== args.args.password) {
+        throw new Error('Invalid password')
+      }
+
+      const apiBuilder = this.app
+        ?.projectBuilders
+        ?.find(pb => pb.id === viewMeta.project_id)
+        ?.apiBuilders
+        ?.find(ab => ab.dbAlias === viewMeta.db_alias);
+
+
+      const model: BaseModelSql = apiBuilder?.xcModels?.[viewMeta.model_name];
+
+      if (model) {
+        const queryParams = JSON.parse(viewMeta.query_params);
+
+        const metas = Object.values((queryParams?.nestedAndLookupColumnParams || {})).flatMap((s: string) => s.split(',')).reduce((obj: any, t) => ({
+          ...obj,
+          [t]: apiBuilder?.metas?.[t]
+        }), {[viewMeta.model_name]: apiBuilder?.metas?.[viewMeta.model_name]})
+
+        return metas;
+
+
+      }
+
+    } catch (e) {
+      throw e;
+    }
+
+  }
+
   protected async getSharedViewData(req, args: any): Promise<any> {
     try {
       console.log(args)
@@ -125,7 +164,7 @@ export default class NcMetaMgrEE extends NcMetaMgr {
         ?.find(pb => pb.id === viewMeta.project_id)
         ?.apiBuilders
         ?.find(ab => ab.dbAlias === viewMeta.db_alias);
-      const model = apiBuilder?.xcModels?.[viewMeta.model_name];
+      const model: BaseModelSql = apiBuilder?.xcModels?.[viewMeta.model_name];
 
       if (model) {
         const queryParams = JSON.parse(viewMeta.query_params);
@@ -144,10 +183,11 @@ export default class NcMetaMgrEE extends NcMetaMgr {
         return {
           model_name: viewMeta.model_name,
           meta: JSON.parse(viewMeta.meta),
-          data: await model.list({
+          data: await model.nestedList({
             ...req.query,
             where,
-            fields
+            fields,
+            ...(queryParams?.nestedAndLookupColumnParams || {})
           }),
           ...await model.countByPk({
             ...req.query,
@@ -206,7 +246,6 @@ export default class NcMetaMgrEE extends NcMetaMgr {
       console.log(e)
     }
   }
-
 
 
   protected async xcVisibilityMetaSet(args) {
@@ -286,7 +325,6 @@ export default class NcMetaMgrEE extends NcMetaMgr {
   }
 
 
-
   protected async xcAuditList(args): Promise<any> {
     return this.xcMeta.metaPaginatedList(this.getProjectId(args), null, 'nc_audit', {
       limit: args.args.limit,
@@ -297,6 +335,7 @@ export default class NcMetaMgrEE extends NcMetaMgr {
       }
     });
   }
+
   protected async xcTableModelsEnable(args): Promise<any> {
 
     const dbAlias = this.getDbAlias(args);

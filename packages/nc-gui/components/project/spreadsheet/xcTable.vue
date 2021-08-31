@@ -126,6 +126,8 @@
             :is-public-view="true"
             :nodes="{dbAlias:''}"
             :sql-ui="sqlUi"
+            :columns-width="columnsWidth"
+            :metas="metas"
           />
         </div>
 
@@ -244,7 +246,7 @@ export default {
     },
     filteredData: [],
     showFields: {},
-    fieldList: [],
+    // fieldList: [],
 
     cellHeights: [{
       size: 'small',
@@ -260,7 +262,8 @@ export default {
       icon: 'mdi-card'
     }],
     rowContextMenu: null,
-    modelName: null
+    modelName: null,
+    metas: {}
   }),
   computed: {
     // availableColumns() {
@@ -475,18 +478,34 @@ export default {
       this.loadingData = true
       try {
         // eslint-disable-next-line camelcase
-        const { data: list, count, meta, model_name, client } = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        this.metas = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+          query: this.queryParams
+        }, 'getSharedViewMetaData', {
+          view_id: this.$route.params.id,
+          password: this.password
+        }])
+
+        // eslint-disable-next-line camelcase
+        const {
+          data: list,
+          count,
+          meta,
+          model_name,
+          client,
+          columnsWidth
+        } = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
           query: this.queryParams
         }, 'getSharedViewData', {
           view_id: this.$route.params.id,
           password: this.password
         }])
+        this.columnsWidth = columnsWidth
         this.client = client
         this.meta = meta
         // eslint-disable-next-line camelcase
         this.modelName = model_name
 
-        this.fieldList = this.meta.columns.map(c => c._cn)
+        // this.fieldList = this.meta.columns.map(c => c._cn)
 
         // const {list, count} = await thi(this.queryParams);
         this.count = count

@@ -165,7 +165,12 @@
               </v-tooltip>
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2 nc-create-gallery-view" v-on="on" @click="openCreateViewDlg('gallery')">
+                  <v-list-item
+                    dense
+                    class="body-2 nc-create-gallery-view"
+                    v-on="on"
+                    @click="openCreateViewDlg('gallery')"
+                  >
                     <v-list-item-icon class="mr-n1">
                       <v-icon color="orange" x-small>
                         mdi-camera-image
@@ -516,7 +521,11 @@ export default {
     viewStatus: Object,
     columnsWidth: Object,
     coverImageField: String,
-    showSystemFields: Boolean
+    showSystemFields: Boolean,
+    otherQueryParams: {
+      type: Object,
+      default: () => ({})
+    }
   },
   data: () => ({
     time: Date.now(),
@@ -708,11 +717,13 @@ export default {
           model_name: this.table,
           meta: this.meta,
           query_params: {
+            ...this.otherQueryParams,
             where: this.concatenatedXWhere,
             sort: this.sort,
             fields: Object.keys(this.showFields)
               .filter(f => this.showFields[f])
-              .join(',')
+              .join(','),
+            columnsWidth: this.columnsWidth
           },
           password: this.sharedViewPassword
         }
