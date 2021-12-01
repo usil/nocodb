@@ -2129,7 +2129,7 @@ class BaseModelSql extends BaseModel {
    */
   async _run(query) {
     try {
-      if (this.config.log) {
+      if (this.config.log || true) {
         const q = query.toQuery();
         console.time(q);
         const data = await query;

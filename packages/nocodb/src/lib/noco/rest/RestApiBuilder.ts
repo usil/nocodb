@@ -27,6 +27,7 @@ import { RestCtrlBelongsTo } from './RestCtrlBelongsTo';
 import { RestCtrlCustom } from './RestCtrlCustom';
 import { RestCtrlHasMany } from './RestCtrlHasMany';
 import { RestCtrlProcedure } from './RestCtrlProcedure';
+import Model from '../../noco-models/Model';
 
 const log = debug('nc:api:rest');
 const NC_CUSTOM_ROUTE_KEY = '__xc_custom';
@@ -355,6 +356,8 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     let tables;
     const swaggerRefs: { [table: string]: any[] } = {};
 
+    const virtualColumnsInsert = [];
+
     /* Get all relations */
     const relations = await this.relationsSyncAndGet();
 
@@ -552,24 +555,71 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               }
             );
           }
-          for (const column of meta.v) {
-            // todo: insert virtual columns
-            // insert in nc_columns & nc_col_relations
+          this.models2[table.tn] = await Model.get({
+            base_id: this.projectId,
+            db_alias: this.dbAlias,
+            tn: table.tn
+          });
+          virtualColumnsInsert.push(async () => {
+            for (const column of meta.v) {
+              // todo: insert virtual columns
+              // insert in nc_columns & nc_col_relations
+              const { id: column_id } = await this.xcMeta.metaInsert2(
+                this.projectId,
+                this.dbAlias,
+                'nc_columns',
+                {
+                  model_id: modelId,
+                  cn: column.cn,
+                  _cn: column._cn,
+                  uidt: column.uidt,
+                  dt: column.dt,
+                  np: column.np,
+                  ns: column.ns,
+                  clen: column.clen,
+                  cop: column.cop,
+                  pk: column.pk,
+                  rqd: column.rqd,
+                  un: column.un,
+                  ct: column.ct,
+                  ai: column.ai,
+                  unique: column.unique,
+                  ctf: column.ctf,
+                  cc: column.cc,
+                  csn: column.csn,
+                  dtx: column.dtx,
+                  dtxp: column.dtxp,
+                  dtxs: column.dtxs,
+                  au: column.au
+                }
+              );
 
-            await this.xcMeta.metaInsert2(
-              this.projectId,
-              this.dbAlias,
-              'nc_columns',
-              {
-                model_id: modelId,
-                cn: column.cn,
-                _cn: column._cn,
-                uidt: column.uidt
-              }
-            );
-          }
+              const rel = column.hm || column.bt;
+
+              const rel_column_id = (
+                await this.models2?.[rel.tn]?.columns
+              )?.find(c => c.cn === rel.cn)?.id;
+              const ref_rel_column_id = (
+                await this.models2?.[rel.tn]?.columns
+              )?.find(c => c.cn === rel.cn)?.id;
+
+              await this.xcMeta.metaInsert2(
+                this.projectId,
+                this.dbAlias,
+                'nc_col_relations',
+                {
+                  type: column.hm ? 'hm' : 'bt',
+                  column_id,
+                  rel_column_id,
+                  ref_rel_column_id,
+                  fkn: rel.fkn,
+                  ur: rel.ur,
+                  dr: rel.dr
+                }
+              );
+            }
+          });
         }
-
         /* create routes for table */
         const routes = new ExpressXcTsRoutes({
           dir: '',
@@ -833,6 +883,10 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     await NcHelp.executeOperations(tableRoutes, this.connectionConfig.client);
     await NcHelp.executeOperations(
       relationRoutes,
+      this.connectionConfig.client
+    );
+    await NcHelp.executeOperations(
+      virtualColumnsInsert,
       this.connectionConfig.client
     );
 
