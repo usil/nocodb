@@ -245,6 +245,7 @@ export default {
         pk: false,
         ai: false,
         cdf: null,
+        ccf: null,
         dt: parentPK.dt,
         dtxp: parentPK.dtxp,
         dtxs: parentPK.dtxs,

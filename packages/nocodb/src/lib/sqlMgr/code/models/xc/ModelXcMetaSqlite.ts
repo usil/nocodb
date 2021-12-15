@@ -87,6 +87,8 @@ class ModelXcMetaSqlite extends BaseModelXcMeta {
         str += `columnDefault: "${args.columns[i].cdf}",\r\n`;
       }
 
+      if (args.columns[i].ccf) str += `ccf: ${args.columns[i].ccf},\r\n`;
+
       if (args.columns[i].un) str += `un: ${args.columns[i].un},\r\n`;
 
       if (args.columns[i].pk) str += `pk: ${args.columns[i].pk},\r\n`;
@@ -479,6 +481,10 @@ class ModelXcMetaSqlite extends BaseModelXcMeta {
       if (column.cdf) {
         columnObj.default = column.cdf;
         columnObj.columnDefault = column.cdf;
+      }
+
+      if (column.ccf) {
+        columnObj.ccf = column.ccf;
       }
 
       if (column.un) {

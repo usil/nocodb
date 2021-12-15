@@ -778,6 +778,10 @@ export default class SqlMgr {
 
     // do sql operation
     const sqlMigrationStatements = await sqlClient[op](opArgs);
+
+    // add comment to column
+    await this.addCommentToColumn(sqlMigrationStatements, opArgs, sqlClient);
+
     console.log(
       `Sql Migration Statement for '${op}'`,
       sqlMigrationStatements.data.object
@@ -821,6 +825,23 @@ export default class SqlMgr {
     }
 
     return sqlMigrationStatements;
+  }
+
+  async addCommentToColumn(sqlMigrationStatements, opArgs, sqlClient) {
+    const lastColumn = opArgs.columns[opArgs.columns.length - 1];
+
+    if (lastColumn.ccf) {
+      const sqlStatement =
+        sqlMigrationStatements.data.object.upStatement[0].sql;
+
+      sqlMigrationStatements.data.object.upStatement[0].sql =
+        sqlStatement.split(';')[0].replace(/ADD/, 'MODIFY') +
+        ` comment "${lastColumn.ccf}";`;
+
+      await sqlClient.knex.schema.raw(
+        sqlMigrationStatements.data.object.upStatement[0].sql
+      );
+    }
   }
 
   public createExpressRoutes(tables, relations, router = 'express') {

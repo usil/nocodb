@@ -350,10 +350,12 @@ export default class NcMetaIOImpl extends NcMetaIO {
     meta?: boolean
   ): Promise<any> {
     try {
-      const ranId = this.getNanoId();
+      const ranId = process.env.FIXED_RAND
+        ? process.env.FIXED_RAND
+        : this.getNanoId();
       const id = `${projectName.toLowerCase().replace(/\W+/g, '_')}_${ranId}`;
       if (meta) {
-        config.prefix = `nc_${ranId}__`;
+        config.prefix = `nc_${projectName.toLowerCase()}_${ranId}__`;
         // if(config.envs._noco?.db?.[0]?.meta?.tn){
         //   config.envs._noco.db[0].meta.tn += `_${prefix}`
         // }

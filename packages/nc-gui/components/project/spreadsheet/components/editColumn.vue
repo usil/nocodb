@@ -351,6 +351,22 @@
                                   @input="newColumn.altered = newColumn.altered || 2"
                                 />
                               </v-col>
+
+                              <v-col cols="12">
+                                <v-textarea
+                                  v-model="newColumn.ccf"
+                                  label="Commend"
+                                  hint="This is ..."
+                                  persistent-hint
+                                  rows="3"
+                                  outlined
+                                  dense
+                                  class="caption"
+                                  @input="
+                                    newColumn.altered = newColumn.altered || 2
+                                  "
+                                />
+                              </v-col>
                             </v-row>
                           </v-container>
                         </v-col>
@@ -601,6 +617,7 @@ export default {
       this.newColumn.pk = false
       this.newColumn.ai = false
       this.newColumn.cdf = null
+      this.newColumn.ccf = null
       this.newColumn.un = false
       this.newColumn.dtxp = this.sqlUi.getDefaultLengthForDatatype(this.newColumn.dt)
       this.newColumn.dtxs = this.sqlUi.getDefaultScaleForDatatype(this.newColumn.dt)
@@ -619,6 +636,7 @@ export default {
         pk: false,
         ai: false,
         cdf: null,
+        ccf: null,
         un: false,
         dtx: 'specificType',
         ...colProp

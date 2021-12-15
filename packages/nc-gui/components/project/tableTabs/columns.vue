@@ -895,6 +895,8 @@ export default {
       }
 
       col.cdf = null
+      col.ccf = null
+
       col.rqd = true
     },
     colPropAIDisabled(col) {

@@ -416,6 +416,7 @@ export default {
       col.altered = col.altered || 2
 
       col.cdf = null
+      col.ccf = null
       col.rqd = true
     },
     colPropAIDisabled(col) {
@@ -477,6 +478,7 @@ export default {
       column.pk = false
       column.ai = false
       column.cdf = null
+      column.ccf = null
       column.dtxp = ' '
       column.dtxs = ' '
 
@@ -500,6 +502,7 @@ export default {
             un: true,
             ai: true,
             cdf: null,
+            ccf: null,
             clen: null,
             np: 10,
             ns: 0,
@@ -520,6 +523,7 @@ export default {
             un: false,
             ai: false,
             cdf: null,
+            ccf: null,
             clen: 45,
             np: null,
             ns: null,
@@ -697,6 +701,7 @@ export default {
         un: false,
         ai: false,
         cdf: null,
+        ccf: null,
         clen: 45,
         np: null,
         ns: null,
